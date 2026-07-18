@@ -27,11 +27,22 @@ def save_history(history):
     with open(MEMORY_FILE, "w") as f:
         json.dump(raw, f, indent=2)
 
+def load_document(filename):
+    with open(filename, "r", encoding="utf-8") as f:
+        return f.read()
+
 conversation_history = load_history()
+document_text = load_document("notes.txt")
 
 def ask(question):
+    prompt = f"""Here is a reference document:
+
+{document_text}
+
+Based on the document above, answer this question: {question}"""
+
     conversation_history.append(
-        types.Content(role="user", parts=[types.Part(text=question)])
+        types.Content(role="user", parts=[types.Part(text=prompt)])
     )
 
     response = client.models.generate_content(
